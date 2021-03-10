@@ -32,6 +32,7 @@ public class XcOauth2Util {
         private String userpic;
         private String utype;
         private String companyId;
+
     }
 
 }
