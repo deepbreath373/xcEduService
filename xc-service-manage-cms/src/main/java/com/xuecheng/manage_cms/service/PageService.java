@@ -32,7 +32,9 @@ public class PageService {
      * @return
      */
     public QueryResponseResult findList(int page, int size, QueryPageRequest queryPageRequest){
-
+        if(queryPageRequest == null){
+            queryPageRequest = new QueryPageRequest();
+        }
         //分页参数
         if(page <=0){
             page = 1;
