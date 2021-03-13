@@ -24,7 +24,7 @@ public class QuerySiteRequest {
     @ApiModelProperty("站点端口")
     private String sitePort;
     //模版id
-    @ApiModelProperty("UrlPath")
+    @ApiModelProperty("访问路径")
     private String siteWebPath;
     //....
 }
