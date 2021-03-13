@@ -10,9 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
@@ -47,6 +45,25 @@ public class CmsPageRepositoryTest {
         Pageable pageable = PageRequest.of(page,size);
         Page<CmsPage> all = cmsPageRepository.findAll(pageable);
         System.out.println(all);
+    }
+
+    @Test
+    public void testFindAllByExample(){
+        int page = 1;
+        int size = 10;
+        Pageable pageable = PageRequest.of(page,size);
+
+        CmsPage cmsPage = new CmsPage();
+        //cmsPage.setSiteId("5a751fab6abb5044e0d19ea1");
+        //cmsPage.setTemplateId("5a925be7b00ffc4b3c1578b5");
+
+        ExampleMatcher exampleMatcher = ExampleMatcher.matching();
+        Example<CmsPage> example = Example.of(cmsPage, exampleMatcher);
+
+        Page<CmsPage> all = cmsPageRepository.findAll(example, pageable);
+        List<CmsPage> content = all.getContent();
+        System.out.println(content);
+
     }
 
     //添加
