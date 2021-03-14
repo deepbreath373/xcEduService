@@ -12,7 +12,6 @@ import io.swagger.annotations.ApiOperation;
 public interface CmsSiteControllerApi {
     //站点查询
     @ApiOperation("分页查询站点列表")
-
     public QueryResponseResult findList(QuerySiteRequest querySiteRequest);
 
 }
