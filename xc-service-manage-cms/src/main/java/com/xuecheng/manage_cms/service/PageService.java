@@ -47,7 +47,9 @@ public class PageService {
         //自定义条件查询
         //定义条件匹配器
         ExampleMatcher exampleMatcher = ExampleMatcher.matching()
-                .withMatcher("pageAliase", ExampleMatcher.GenericPropertyMatchers.contains());
+                .withMatcher("pageAliase", ExampleMatcher.GenericPropertyMatchers.contains())
+                .withMatcher("pageName", ExampleMatcher.GenericPropertyMatchers.contains())
+                .withMatcher("pageType", ExampleMatcher.GenericPropertyMatchers.exact());
         //条件值对象
         CmsPage cmsPage = new CmsPage();
         if (StringUtils.isNotEmpty(queryPageRequest.getSiteId())) {
@@ -58,6 +60,12 @@ public class PageService {
         }
         if (StringUtils.isNotEmpty(queryPageRequest.getPageAliase())) {
             cmsPage.setPageAliase(queryPageRequest.getPageAliase());
+        }
+        if (StringUtils.isNotEmpty(queryPageRequest.getPageName())) {
+            cmsPage.setPageName(queryPageRequest.getPageName());
+        }
+        if (StringUtils.isNotEmpty(queryPageRequest.getPageType())) {
+            cmsPage.setPageType(queryPageRequest.getPageType());
         }
 
         //定义条件对象
