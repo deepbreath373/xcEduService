@@ -7,7 +7,9 @@ import com.mongodb.client.gridfs.GridFSBuckets;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
+@Component
 @Configuration
 public class MongoConfig {
     @Value("${spring.data.mongodb.database}")
