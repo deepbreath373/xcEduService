@@ -7,15 +7,12 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.io.Serializable;
 
-/**
- * Created by admin on 2018/2/10.
- */
 @Data
 @ToString
 @Entity
-@Table(name="course_base")
-//@GenericGenerator(name = "jpa-assigned", strategy = "assigned")
+@Table(name = "course_base")
 @GenericGenerator(name = "jpa-uuid", strategy = "uuid")
+
 public class CourseBase implements Serializable {
     private static final long serialVersionUID = -916357110051689486L;
     @Id
@@ -31,9 +28,8 @@ public class CourseBase implements Serializable {
     private String teachmode;
     private String description;
     private String status;
-    @Column(name="company_id")
+    @Column(name = "company_id")
     private String companyId;
-    @Column(name="user_id")
+    @Column(name = "user_id")
     private String userId;
-
 }
