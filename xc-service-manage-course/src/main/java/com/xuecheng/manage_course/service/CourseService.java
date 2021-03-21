@@ -4,16 +4,15 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.xuecheng.framework.domain.course.CourseBase;
 import com.xuecheng.framework.domain.course.CourseMarket;
+import com.xuecheng.framework.domain.course.Teachplan;
 import com.xuecheng.framework.domain.course.ext.CourseInfo;
 import com.xuecheng.framework.domain.course.ext.TeachplanNode;
 import com.xuecheng.framework.domain.course.request.CourseListRequest;
 import com.xuecheng.framework.domain.course.response.AddCourseResult;
 import com.xuecheng.framework.exception.ExceptionCast;
 import com.xuecheng.framework.model.response.*;
-import com.xuecheng.manage_course.dao.CourseBaseRepository;
-import com.xuecheng.manage_course.dao.CourseMapper;
-import com.xuecheng.manage_course.dao.CourseMarketRepository;
-import com.xuecheng.manage_course.dao.TeachplanMapper;
+import com.xuecheng.manage_course.dao.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +32,8 @@ public class CourseService {
     CourseBaseRepository courseBaseRepository;
     @Autowired
     CourseMarketRepository courseMarketRepository;
+    @Autowired
+    TeachplanRepository teachplanRepository;
 
     //课程计划查询
     public TeachplanNode findTeachplanList(String courseId) {
@@ -120,14 +121,79 @@ public class CourseService {
             one.setQq(courseMarket.getQq());
             one.setValid(courseMarket.getValid());
             courseMarketRepository.save(one);
-        }else{
+        } else {
             //添加课程营销信息
             one = new CourseMarket();
-            BeanUtils.copyProperties(courseMarket,one);
+            BeanUtils.copyProperties(courseMarket, one);
             //设置课程id
             one.setId(id);
             courseMarketRepository.save(one);
         }
         return one;
+    }
+
+    //获取课程根节点，如果没有则添加根节点
+    public String getTeachplanRoot(String courseId) {
+        //校验课程id
+        Optional<CourseBase> optional = courseBaseRepository.findById(courseId);
+        if (optional.isPresent()) {
+            return null;
+        }
+        CourseBase courseBase = optional.get();
+        //取出课程计划根结点
+        List<Teachplan> teachplanList = teachplanRepository.findByCourseidAndParentid(courseId, "0");
+        if (teachplanList == null || teachplanList.size() == 0) {
+            //新增一个根结点
+            Teachplan teachplanRoot = new Teachplan();
+            teachplanRoot.setCourseid(courseId);
+            teachplanRoot.setPname(courseBase.getName());
+            teachplanRoot.setParentid("0");
+            teachplanRoot.setGrade("1");
+            teachplanRoot.setStatus("0");
+            teachplanRepository.save(teachplanRoot);
+            return teachplanRoot.getId();
+        }
+        Teachplan teachplan = teachplanList.get(0);
+        return teachplan.getId();
+    }
+
+    //添加课程计划
+    @Transactional
+    public ResponseResult addTeachplan(Teachplan teachplan) {
+        //校验课程id和课程计划名称
+        if (teachplan == null ||
+                StringUtils.isEmpty(teachplan.getCourseid()) ||
+                StringUtils.isEmpty(teachplan.getPname())){
+            ExceptionCast.cast(CommonCode.INVALID_PARAM);
+        }
+        //取出课程id
+        String courseid = teachplan.getCourseid();
+        //取出父结点id
+        String parentid = teachplan.getParentid();
+        if(StringUtils.isEmpty(parentid)){
+            //如果为空则设置当前课程为根节点
+            parentid = this.getTeachplanRoot(courseid);
+        }
+
+        //取出父结点信息
+        Optional<Teachplan> optional = teachplanRepository.findById(parentid);
+        if(!optional.isPresent()){
+            ExceptionCast.cast(CommonCode.INVALID_PARAM);
+        }
+        //父结点
+        Teachplan teachplanParent = optional.get();
+        //父结点级别
+        String parentGrade = teachplanParent.getGrade();
+        //设置父结点
+        teachplan.setParentid(parentid);
+        teachplan.setStatus("0");
+        if(parentGrade.equals("1")){
+            teachplan.setGrade("2");
+        }else if(parentGrade.equals("2")){
+            teachplan.setGrade("3");
+        }
+        teachplan.setCourseid((teachplanParent.getCourseid()));
+        teachplanRepository.save(teachplan);
+        return new ResponseResult(CommonCode.SUCCESS);
     }
 }
