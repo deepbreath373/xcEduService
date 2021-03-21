@@ -7,6 +7,7 @@ import com.xuecheng.framework.domain.course.ext.TeachplanNode;
 import com.xuecheng.framework.domain.course.request.CourseListRequest;
 import com.xuecheng.framework.domain.course.response.AddCourseResult;
 import com.xuecheng.framework.model.response.QueryResponseResult;
+import com.xuecheng.framework.model.response.ResponseResult;
 import com.xuecheng.manage_course.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -34,5 +35,17 @@ public class CourseController implements CourseControllerApi {
     @PostMapping("/coursebase/add")
     public AddCourseResult addCourseBase(@RequestBody CourseBase courseBase) {
         return courseService.addCourseBase(courseBase);
+    }
+
+    @Override
+    @GetMapping("/coursebase/get/{courseId}")
+    public CourseBase getCourseBaseById(@PathVariable("courseId") String courseId) throws RuntimeException {
+        return courseService.getCoursebaseById(courseId);
+    }
+
+    @Override
+    @PostMapping("/coursebase/update/{id}")
+    public ResponseResult updateCourseBase(@PathVariable("id") String id,@RequestBody CourseBase courseBase) {
+        return courseService.updateCoursebase(id,courseBase);
     }
 }

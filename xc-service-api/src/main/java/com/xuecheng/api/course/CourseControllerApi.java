@@ -6,6 +6,7 @@ import com.xuecheng.framework.domain.course.ext.TeachplanNode;
 import com.xuecheng.framework.domain.course.request.CourseListRequest;
 import com.xuecheng.framework.domain.course.response.AddCourseResult;
 import com.xuecheng.framework.model.response.QueryResponseResult;
+import com.xuecheng.framework.model.response.ResponseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -24,4 +25,10 @@ public interface CourseControllerApi {
 
     @ApiOperation("添加课程基础信息")
     public AddCourseResult addCourseBase(CourseBase courseBase);
+
+    @ApiOperation("获取课程基础信息")
+    public CourseBase getCourseBaseById(String courseId) throws RuntimeException;
+
+    @ApiOperation("更新课程基础信息")
+    public ResponseResult updateCourseBase(String id, CourseBase courseBase);
 }
