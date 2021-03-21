@@ -136,7 +136,7 @@ public class CourseService {
     public String getTeachplanRoot(String courseId) {
         //校验课程id
         Optional<CourseBase> optional = courseBaseRepository.findById(courseId);
-        if (optional.isPresent()) {
+        if (!optional.isPresent()) {
             return null;
         }
         CourseBase courseBase = optional.get();
@@ -172,7 +172,7 @@ public class CourseService {
         String parentid = teachplan.getParentid();
         if(StringUtils.isEmpty(parentid)){
             //如果为空则设置当前课程为根节点
-            parentid = this.getTeachplanRoot(courseid);
+            parentid = getTeachplanRoot(courseid);
         }
 
         //取出父结点信息
