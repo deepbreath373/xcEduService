@@ -65,6 +65,13 @@ public class CourseController implements CourseControllerApi {
     }
 
     @Override
+    @PostMapping("/coursepic/add")
+    public ResponseResult addCoursePic(@RequestParam("courseId") String courseId,@RequestParam("pic") String pic) {
+        //保存课程图片
+        return courseService.addCoursePic(courseId,pic);
+    }
+
+    @Override
     @PostMapping("/coursemarket/update/{id}")
     public ResponseResult updatecourseMarket(@PathVariable("id") String id,@RequestBody CourseMarket courseMarket) {
         CourseMarket courseMarket_u = courseService.updateCourseMarket(id, courseMarket);

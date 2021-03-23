@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.xuecheng.framework.domain.course.CourseBase;
 import com.xuecheng.framework.domain.course.CourseMarket;
+import com.xuecheng.framework.domain.course.CoursePic;
 import com.xuecheng.framework.domain.course.Teachplan;
 import com.xuecheng.framework.domain.course.ext.CourseInfo;
 import com.xuecheng.framework.domain.course.ext.TeachplanNode;
@@ -34,6 +35,8 @@ public class CourseService {
     CourseMarketRepository courseMarketRepository;
     @Autowired
     TeachplanRepository teachplanRepository;
+    @Autowired
+    CoursePicRepository coursePicRepository;
 
     //课程计划查询
     public TeachplanNode findTeachplanList(String courseId) {
@@ -163,21 +166,21 @@ public class CourseService {
         //校验课程id和课程计划名称
         if (teachplan == null ||
                 StringUtils.isEmpty(teachplan.getCourseid()) ||
-                StringUtils.isEmpty(teachplan.getPname())){
+                StringUtils.isEmpty(teachplan.getPname())) {
             ExceptionCast.cast(CommonCode.INVALID_PARAM);
         }
         //取出课程id
         String courseid = teachplan.getCourseid();
         //取出父结点id
         String parentid = teachplan.getParentid();
-        if(StringUtils.isEmpty(parentid)){
+        if (StringUtils.isEmpty(parentid)) {
             //如果为空则设置当前课程为根节点
             parentid = getTeachplanRoot(courseid);
         }
 
         //取出父结点信息
         Optional<Teachplan> optional = teachplanRepository.findById(parentid);
-        if(!optional.isPresent()){
+        if (!optional.isPresent()) {
             ExceptionCast.cast(CommonCode.INVALID_PARAM);
         }
         //父结点
@@ -187,13 +190,32 @@ public class CourseService {
         //设置父结点
         teachplan.setParentid(parentid);
         teachplan.setStatus("0");
-        if(parentGrade.equals("1")){
+        if (parentGrade.equals("1")) {
             teachplan.setGrade("2");
-        }else if(parentGrade.equals("2")){
+        } else if (parentGrade.equals("2")) {
             teachplan.setGrade("3");
         }
         teachplan.setCourseid((teachplanParent.getCourseid()));
         teachplanRepository.save(teachplan);
+        return new ResponseResult(CommonCode.SUCCESS);
+    }
+
+    //向课程管理数据库添加课程与图片的关联信息
+    @Transactional
+    public ResponseResult addCoursePic(String courseId, String pic) {
+        //课程图片信息
+        CoursePic coursePic = null;
+        //查询课程图片
+        Optional<CoursePic> picOptional = coursePicRepository.findById(courseId);
+        if (picOptional.isPresent()) {
+            coursePic = picOptional.get();
+        }
+        if(coursePic == null){
+            coursePic = new CoursePic();
+        }
+        coursePic.setPic(pic);
+        coursePic.setCourseid(courseId);
+        coursePicRepository.save(coursePic);
         return new ResponseResult(CommonCode.SUCCESS);
     }
 }
