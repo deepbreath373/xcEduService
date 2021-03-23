@@ -3,6 +3,7 @@ package com.xuecheng.manage_cms;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
@@ -13,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
  * @version 1.0
  * @create 2018-09-12 17:13
  **/
+@EnableDiscoveryClient //表示该项目为eureka的客户端，EurekaClient从EurekaServer发现服务
 @SpringBootApplication//扫描启动类所在包下的所有Bean
 @EntityScan("com.xuecheng.framework.domain.cms")//扫描model项目下的实体类
 @ComponentScan(basePackages={"com.xuecheng.api"})//扫描api项目下的接口
