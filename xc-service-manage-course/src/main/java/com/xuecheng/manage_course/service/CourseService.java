@@ -218,4 +218,14 @@ public class CourseService {
         coursePicRepository.save(coursePic);
         return new ResponseResult(CommonCode.SUCCESS);
     }
+
+    //查询课程图片
+    public CoursePic findCoursePic(String courseId) {
+        Optional<CoursePic> picOptional = coursePicRepository.findById(courseId);
+        if(picOptional.isPresent()){
+            CoursePic coursePic = picOptional.get();
+            return coursePic;
+        }
+        return null;
+    }
 }
