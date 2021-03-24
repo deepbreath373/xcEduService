@@ -7,6 +7,7 @@ import com.xuecheng.framework.domain.course.CourseMarket;
 import com.xuecheng.framework.domain.course.CoursePic;
 import com.xuecheng.framework.domain.course.Teachplan;
 import com.xuecheng.framework.domain.course.ext.CourseInfo;
+import com.xuecheng.framework.domain.course.ext.CourseView;
 import com.xuecheng.framework.domain.course.ext.TeachplanNode;
 import com.xuecheng.framework.domain.course.request.CourseListRequest;
 import com.xuecheng.framework.domain.course.response.AddCourseResult;
@@ -237,5 +238,31 @@ public class CourseService {
             return new ResponseResult(CommonCode.SUCCESS);
         }
         return new ResponseResult(CommonCode.FAIL);
+    }
+
+    //查询课程视图，包括基本信息、图片、营销、课程计划
+    public CourseView getCourseView(String id) {
+        CourseView courseView = new CourseView();
+        //查询课程基本信息
+        Optional<CourseBase> courseBaseOptional = courseBaseRepository.findById(id);
+        if(courseBaseOptional.isPresent()){
+            courseView.setCourseBase(courseBaseOptional.get());
+        }
+        //查询课程图片
+        Optional<CoursePic> coursePicOptional = coursePicRepository.findById(id);
+        if (courseBaseOptional.isPresent()){
+            courseView.setCoursePic(coursePicOptional.get());
+        }
+        //查询课程营销
+        Optional<CourseMarket> courseMarketOptional = courseMarketRepository.findById(id);
+        if(courseMarketOptional.isPresent()){
+            courseView.setCourseMarket(courseMarketOptional.get());
+        }
+        //查询课程计划
+        TeachplanNode teachplanNode = teachplanMapper.selectList(id);
+        if(teachplanNode != null){
+            courseView.setTeachplanNode(teachplanNode);
+        }
+        return courseView;
     }
 }
