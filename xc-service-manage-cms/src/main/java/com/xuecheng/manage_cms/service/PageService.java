@@ -366,10 +366,10 @@ public class PageService {
     //保存页面，有则更新，无则添加
     public CmsPageResult save(CmsPage cmsPage) {
         //判断页面是否存在
-        CmsPage cmsPage1 = cmsPageRepository.findByPageNameAndSiteIdAndPageWebPath(cmsPage.getPageName(), cmsPage.getSiteId(), cmsPage.getPageWebPath());
-        if(cmsPage1!=null){
+        CmsPage one = cmsPageRepository.findByPageNameAndSiteIdAndPageWebPath(cmsPage.getPageName(), cmsPage.getSiteId(), cmsPage.getPageWebPath());
+        if(one!=null){
             //进行更新
-            return this.update(cmsPage.getPageId(),cmsPage);
+            return this.update(one.getPageId(),cmsPage);
         }
         return this.add(cmsPage);
     }
