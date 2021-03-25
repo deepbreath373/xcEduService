@@ -24,6 +24,7 @@ public class CmsPagePreviewController extends BaseController {
         String pageHtml = pageService.getPageHtml(pageId);
         //通过response输出内容
         ServletOutputStream outputStream = response.getOutputStream();
+        response.setHeader("Content-type","text/html;charset=utf-8");
         outputStream.write(pageHtml.getBytes("utf-8"));
     }
 }
