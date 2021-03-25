@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
+import com.xuecheng.framework.domain.cms.response.CmsPostPageResult;
 import com.xuecheng.framework.domain.course.CourseBase;
 import com.xuecheng.framework.domain.course.CourseMarket;
 import com.xuecheng.framework.domain.course.CoursePic;
@@ -288,9 +289,9 @@ public class CourseService {
     }
 
     //根据id查询课程基本信息
-    public CourseBase findCourseBaseById(String courseId){
+    public CourseBase findCourseBaseById(String courseId) {
         Optional<CourseBase> baseOptional = courseBaseRepository.findById(courseId);
-        if(baseOptional.isPresent()){
+        if (baseOptional.isPresent()) {
             CourseBase courseBase = baseOptional.get();
             return courseBase;
         }
@@ -306,8 +307,8 @@ public class CourseService {
         //获取cmsPage
         CmsPage cmsPage = new CmsPage();
         cmsPage.setSiteId(publish_siteId);
-        cmsPage.setDataUrl(publish_dataUrlPre+id);
-        cmsPage.setPageName(id+".html");
+        cmsPage.setDataUrl(publish_dataUrlPre + id);
+        cmsPage.setPageName(id + ".html");
         cmsPage.setPageAliase(courseBaseById.getName());
         cmsPage.setPagePhysicalPath(publish_page_physicalpath);
         cmsPage.setPageWebPath(publish_page_webpath);
@@ -315,7 +316,7 @@ public class CourseService {
         //远程调用cms
         CmsPageResult cmsPageResult = cmsPageClient.saveCmsPage(cmsPage);
         if (!cmsPageResult.isSuccess()) {
-            return new CoursePublishResult(CommonCode.FAIL,null);
+            return new CoursePublishResult(CommonCode.FAIL, null);
         }
         CmsPage cmsPage1 = cmsPageResult.getCmsPage();
         String pageId = cmsPage1.getPageId();
@@ -324,5 +325,46 @@ public class CourseService {
 
         //返回CoursePublishResult对象（当中包含了页面预览的url）
         return new CoursePublishResult(CommonCode.SUCCESS, url);
+    }
+
+    //页面发布
+    @Transactional
+    public CoursePublishResult publish(String id) {
+        //查询课程
+        CourseBase courseBaseById = this.findCourseBaseById(id);
+        //获取cmsPage
+        CmsPage cmsPage = new CmsPage();
+        cmsPage.setSiteId(publish_siteId);
+        cmsPage.setDataUrl(publish_dataUrlPre + id);
+        cmsPage.setPageName(id + ".html");
+        cmsPage.setPageAliase(courseBaseById.getName());
+        cmsPage.setPagePhysicalPath(publish_page_physicalpath);
+        cmsPage.setPageWebPath(publish_page_webpath);
+        cmsPage.setTemplateId(publish_templateId);
+
+        //调用cms一键发布接口将课程详情页面发布到服务器
+        CmsPostPageResult cmsPostPageResult = cmsPageClient.postPageQuick(cmsPage);
+        if (!cmsPostPageResult.isSuccess()) {
+            return new CoursePublishResult(CommonCode.FAIL, null);
+        }
+        //保存课程的发布状态为“已发布”
+        CourseBase courseBase = this.saveCoursePubState(id);
+        if (courseBase == null) {
+            return new CoursePublishResult(CommonCode.FAIL, null);
+        }
+
+        //保存课堂索引信息
+        //...
+
+        String pageUrl = cmsPostPageResult.getPageUrl();
+        return new CoursePublishResult(CommonCode.SUCCESS,pageUrl);
+    }
+
+    //更新课程的状态(为已发布 202002)
+    private CourseBase saveCoursePubState(String courseId) {
+        CourseBase courseBaseById = this.findCourseBaseById(courseId);
+        courseBaseById.setStatus("202002");
+        courseBaseRepository.save(courseBaseById);
+        return courseBaseById;
     }
 }

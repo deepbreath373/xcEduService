@@ -99,6 +99,12 @@ public class CourseController implements CourseControllerApi {
     }
 
     @Override
+    @PostMapping("/publish/{id}")
+    public CoursePublishResult publish(@PathVariable("id") String id) {
+        return courseService.publish(id);
+    }
+
+    @Override
     @PostMapping("/coursemarket/update/{id}")
     public ResponseResult updatecourseMarket(@PathVariable("id") String id,@RequestBody CourseMarket courseMarket) {
         CourseMarket courseMarket_u = courseService.updateCourseMarket(id, courseMarket);
