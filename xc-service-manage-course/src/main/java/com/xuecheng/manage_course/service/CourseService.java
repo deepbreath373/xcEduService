@@ -1,14 +1,12 @@
 package com.xuecheng.manage_course.service;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
 import com.xuecheng.framework.domain.cms.response.CmsPostPageResult;
-import com.xuecheng.framework.domain.course.CourseBase;
-import com.xuecheng.framework.domain.course.CourseMarket;
-import com.xuecheng.framework.domain.course.CoursePic;
-import com.xuecheng.framework.domain.course.Teachplan;
+import com.xuecheng.framework.domain.course.*;
 import com.xuecheng.framework.domain.course.ext.CourseInfo;
 import com.xuecheng.framework.domain.course.ext.CourseView;
 import com.xuecheng.framework.domain.course.ext.TeachplanNode;
@@ -27,6 +25,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,6 +45,8 @@ public class CourseService {
     TeachplanRepository teachplanRepository;
     @Autowired
     CoursePicRepository coursePicRepository;
+    @Autowired
+    CoursePubRepository coursePubRepository;
     @Autowired
     CmsPageClient cmsPageClient;
 
@@ -354,10 +356,66 @@ public class CourseService {
         }
 
         //保存课堂索引信息
-        //...
+        //先创建一个coursePub对象
+        CoursePub coursePub = createCoursePub(id);
+        //将coursePub对象保存到数据库
+        saveCoursePub(id,coursePub);
 
         String pageUrl = cmsPostPageResult.getPageUrl();
-        return new CoursePublishResult(CommonCode.SUCCESS,pageUrl);
+        return new CoursePublishResult(CommonCode.SUCCESS, pageUrl);
+    }
+
+    //将coursePub对象保存到数据库
+    private CoursePub saveCoursePub(String id, CoursePub coursePub) {
+        CoursePub coursePubNew = new CoursePub();
+        //根据课程id查询coursePub
+        Optional<CoursePub> coursePubOptional = coursePubRepository.findById(id);
+        if (coursePubOptional.isPresent()) {
+            coursePubNew = coursePubOptional.get();
+        } else {
+            coursePubNew = new CoursePub();
+        }
+
+        //将coursePub对象中的信息保存到coursePubNew中
+        BeanUtils.copyProperties(coursePub,coursePubNew);
+        coursePubNew.setId(id);
+        //时间戳,给logstach使用
+        coursePubNew.setTimestamp(new Date());
+        //发布时间
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
+        String date = simpleDateFormat.format(new Date());
+        coursePubNew.setPubTime(date);
+        coursePubRepository.save(coursePubNew);
+        return coursePubNew;
+    }
+
+    //创建coursePub对象
+    private CoursePub createCoursePub(String id) {
+        CoursePub coursePub = new CoursePub();
+        //根据课程id查询course_base
+        Optional<CourseBase> courseBaseOptional = courseBaseRepository.findById(id);
+        if (courseBaseOptional.isPresent()) {
+            CourseBase courseBase = courseBaseOptional.get();
+            //将courseBase中的属性拷贝到coursePub中
+            BeanUtils.copyProperties(courseBase, coursePub);
+        }
+        //根据课程id查询course_pic
+        Optional<CoursePic> coursePicOptional = coursePicRepository.findById(id);
+        if (coursePicOptional.isPresent()) {
+            CoursePic coursePic = coursePicOptional.get();
+            BeanUtils.copyProperties(coursePic, coursePub);
+        }
+        //根据课程id查询course_market
+        Optional<CourseMarket> courseMarketOptional = courseMarketRepository.findById(id);
+        if (courseMarketOptional.isPresent()) {
+            CourseMarket courseMarket = courseMarketOptional.get();
+            BeanUtils.copyProperties(courseMarket, coursePub);
+        }
+        //课程计划信息
+        TeachplanNode teachplanNode = teachplanMapper.selectList(id);
+        String jsonString = JSON.toJSONString(teachplanNode);
+        coursePub.setTeachplan(jsonString);
+        return coursePub;
     }
 
     //更新课程的状态(为已发布 202002)
