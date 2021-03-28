@@ -274,7 +274,7 @@ public class CourseService {
         }
         //查询课程图片
         Optional<CoursePic> coursePicOptional = coursePicRepository.findById(id);
-        if (courseBaseOptional.isPresent()) {
+        if (coursePicOptional.isPresent()) {
             courseView.setCoursePic(coursePicOptional.get());
         }
         //查询课程营销
