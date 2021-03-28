@@ -367,7 +367,7 @@ public class CourseService {
 
     //将coursePub对象保存到数据库
     private CoursePub saveCoursePub(String id, CoursePub coursePub) {
-        CoursePub coursePubNew = new CoursePub();
+        CoursePub coursePubNew = null;
         //根据课程id查询coursePub
         Optional<CoursePub> coursePubOptional = coursePubRepository.findById(id);
         if (coursePubOptional.isPresent()) {
