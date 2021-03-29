@@ -32,7 +32,7 @@ public class EsCourseService {
     private String index;
     @Value("${xuecheng.course.type}")
     private String type;
-    @Value("${xuecheng.course.source_field")
+    @Value("${xuecheng.course.source_field}")
     private String source_field;
 
     @Autowired
@@ -51,8 +51,10 @@ public class EsCourseService {
 
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         //过滤源字段
-        String[] source_field_array = source_field.split(",");
-        searchSourceBuilder.fetchSource(source_field_array, new String[]{});
+        String[] split = source_field.split(",");
+        //设置不同的字段能够跑通程序
+        /*searchSourceBuilder.fetchSource(new String[]{ "id","name","grade","mt","st","charge","valid","pic","qq","price","price_old","status","studymodel","teachmode","expires","pub_time","start_time","end_time"}, new String[]{});*/
+        searchSourceBuilder.fetchSource(split, new String[]{});
         //创建布尔查询对象
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         //搜索条件
