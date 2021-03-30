@@ -52,8 +52,6 @@ public class EsCourseService {
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         //过滤源字段
         String[] split = source_field.split(",");
-        //设置不同的字段能够跑通程序
-        /*searchSourceBuilder.fetchSource(new String[]{ "id","name","grade","mt","st","charge","valid","pic","qq","price","price_old","status","studymodel","teachmode","expires","pub_time","start_time","end_time"}, new String[]{});*/
         searchSourceBuilder.fetchSource(split, new String[]{});
         //创建布尔查询对象
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
@@ -92,19 +90,19 @@ public class EsCourseService {
                 String pic = (String) sourceAsMap.get("pic");
                 coursePub.setPic(pic);
                 //取出价格
-                Float price = null;
+                Double price = null;
                 try {
                     if (sourceAsMap.get("price") != null) {
-                        price = Float.parseFloat((String) sourceAsMap.get("price"));
+                        price = (Double) sourceAsMap.get("price");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 coursePub.setPrice(price);
-                Float price_old = null;
+                Double price_old = null;
                 try {
                     if (sourceAsMap.get("price_old") != null) {
-                        price_old = Float.parseFloat((String) sourceAsMap.get("price_old"));
+                        price_old = (Double) sourceAsMap.get("price_old");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
