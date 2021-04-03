@@ -12,6 +12,7 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -22,7 +23,7 @@ public class MediaUploadService {
     @Autowired
     MediaFileRepository mediaFileRepository;
 
-    @Value("xc-service-manage-media.upload-location")
+    @Value("${xc-service-manage-media.upload-location}")
     String upload_location;
 
     //得到文件所属目录路径
@@ -133,7 +134,8 @@ public class MediaUploadService {
         File chunkFileFolder = new File(chunkFileFolderPath);
         //分块文件列表
         File[] files = chunkFileFolder.listFiles();
-        List<File> fileList = Arrays.asList(files);
+        List<File> fileList = new ArrayList<File>();
+        fileList.addAll(Arrays.asList(files));
         //创建一个合并文件
         String filePath = this.getFilePath(fileMd5, fileExt);
         File mergeFile = new File(filePath);
@@ -170,9 +172,13 @@ public class MediaUploadService {
 
     //校验文件
     private boolean checkFileMd5(File mergeFile, String md5) {
+        if (mergeFile == null || StringUtils.isEmpty(md5)) {
+            return false;
+        }
+        FileInputStream inputStream = null;
         try {
             //创建文件的输入流
-            FileInputStream inputStream = new FileInputStream(mergeFile);
+            inputStream = new FileInputStream(mergeFile);
             //得到文件的MD5
             String md5Hex = DigestUtils.md5Hex(inputStream);
             //和传入的MD5进行比较
@@ -181,6 +187,12 @@ public class MediaUploadService {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }finally {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return false;
 
@@ -200,7 +212,10 @@ public class MediaUploadService {
             Collections.sort(chunkFileList, new Comparator<File>() {
                 @Override
                 public int compare(File o1, File o2) {
-                    return Integer.parseInt(o1.getName()) - Integer.parseInt(o2.getName());
+                    if(Integer.parseInt(o1.getName()) > Integer.parseInt(o2.getName())){
+                        return 1;
+                    };
+                    return -1;
                 }
             });
 
@@ -208,10 +223,10 @@ public class MediaUploadService {
             RandomAccessFile raf_write = new RandomAccessFile(mergeFile, "rw");
             byte[] b = new byte[1024];
             for (File chunkFile : chunkFileList) {
-                RandomAccessFile raf_read = new RandomAccessFile(mergeFile, "r");
+                RandomAccessFile raf_read = new RandomAccessFile(chunkFile, "r");
                 int len = -1;
                 while ((len = raf_read.read(b)) != -1) {
-                    raf_read.write(b, 0, len);
+                    raf_write.write(b, 0, len);
                 }
                 raf_read.close();
             }
