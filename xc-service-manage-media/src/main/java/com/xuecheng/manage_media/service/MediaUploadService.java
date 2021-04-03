@@ -7,11 +7,16 @@ import com.xuecheng.framework.exception.ExceptionCast;
 import com.xuecheng.framework.model.response.CommonCode;
 import com.xuecheng.framework.model.response.ResponseResult;
 import com.xuecheng.manage_media.dao.MediaFileRepository;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Optional;
 
 @Service
@@ -78,12 +83,47 @@ public class MediaUploadService {
         String chunkFileFolderPath = this.getChunkFileFolderPath(fileMd5);
         //块文件
         File chunkFile = new File(chunkFileFolderPath + chunk);
-        if(chunkFile.exists()){
+        if (chunkFile.exists()) {
             //块文件存在
-            return new CheckChunkResult(CommonCode.SUCCESS,true);
-        }else {
+            return new CheckChunkResult(CommonCode.SUCCESS, true);
+        } else {
             //块文件不存在
-            return new CheckChunkResult(CommonCode.SUCCESS,false);
+            return new CheckChunkResult(CommonCode.SUCCESS, false);
         }
+    }
+
+    //上传分块
+    public ResponseResult uploadchunk(MultipartFile file, String fileMd5, Integer chunk) {
+        //检查分块目录，如果不存在则要自动创建
+        //得到分块目录
+        String chunkFileFolderPath = this.getChunkFileFolderPath(fileMd5);
+        //得到分块文件路径
+        String chunkFilePath = chunkFileFolderPath + chunk;
+        File chunkFileFolder = new File(chunkFileFolderPath);
+        if (!chunkFileFolder.exists()) {
+            chunkFileFolder.mkdirs();
+        }
+        //得到上传文件的输入流
+        InputStream inputStream = null;
+        FileOutputStream outputStream = null;
+        try {
+            inputStream = file.getInputStream();
+            outputStream = new FileOutputStream(new File(chunkFilePath));
+            IOUtils.copy(inputStream,outputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return new ResponseResult(CommonCode.SUCCESS);
     }
 }
