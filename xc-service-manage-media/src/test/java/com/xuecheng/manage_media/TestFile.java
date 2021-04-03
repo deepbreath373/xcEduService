@@ -62,10 +62,7 @@ public class TestFile {
         Collections.sort(fileList, new Comparator<File>() {
             @Override
             public int compare(File o1, File o2) {
-                if (Integer.parseInt(o1.getName()) < Integer.parseInt(o2.getName())) {
-                    return -1;
-                }
-                return 1;
+                    return Integer.parseInt(o1.getName()) - Integer.parseInt(o2.getName());
             }
         });
         //合并文件

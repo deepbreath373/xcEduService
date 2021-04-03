@@ -38,8 +38,10 @@ public class MediaUploadController implements MediaUploadControllerApi {
         return mediaUploadService.uploadchunk(file,fileMd5,chunk);
     }
 
+    //合并分块
     @Override
+    @PostMapping("/mergechunks")
     public ResponseResult mergechunks(String fileMd5, String fileName, Long fileSize, String mimetype, String fileExt) {
-        return null;
+        return mediaUploadService.mergechunks(fileMd5,fileName,fileSize,mimetype,fileExt);
     }
 }
