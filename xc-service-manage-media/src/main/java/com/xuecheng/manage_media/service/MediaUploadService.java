@@ -1,6 +1,7 @@
 package com.xuecheng.manage_media.service;
 
 import com.xuecheng.framework.domain.media.MediaFile;
+import com.xuecheng.framework.domain.media.response.CheckChunkResult;
 import com.xuecheng.framework.domain.media.response.MediaCode;
 import com.xuecheng.framework.exception.ExceptionCast;
 import com.xuecheng.framework.model.response.CommonCode;
@@ -23,12 +24,17 @@ public class MediaUploadService {
 
     //得到文件所属目录路径
     private String getFileFolderPath(String fileMd5) {
-        return upload_location + fileMd5.substring(0, 1) + "/" + fileMd5.substring(1, 2) + "/" + fileMd5;
+        return upload_location + fileMd5.substring(0, 1) + "/" + fileMd5.substring(1, 2) + "/" + fileMd5 + "/";
     }
 
     //得到文件的路径
     private String getFilePath(String fileMd5, String fileExt) {
         return upload_location + fileMd5.substring(0, 1) + "/" + fileMd5.substring(1, 2) + "/" + fileMd5 + "/" + fileMd5 + "." + fileExt;
+    }
+
+    //得到块文件所属目录路径
+    private String getChunkFileFolderPath(String fileMd5) {
+        return upload_location + fileMd5.substring(0, 1) + "/" + fileMd5.substring(1, 2) + "/" + fileMd5 + "/chunk/";
     }
 
     /*** 根据文件md5得到文件路径*
@@ -42,8 +48,6 @@ public class MediaUploadService {
      * @param fileExt 文件扩展名 *
      * @return 文件路径 *
      */
-
-
     public ResponseResult register(String fileMd5, String fileName, Long fileSize, String mimetype, String fileExt) {
         //1 检查文件在磁盘上是否存在
         //文件所属目录的路径
@@ -55,15 +59,31 @@ public class MediaUploadService {
         boolean exists = file.exists();
         //2 检查文件信息在mongodb中是否存在
         Optional<MediaFile> optional = mediaFileRepository.findById(fileMd5);
-        if(exists && optional.isPresent()){
+        if (exists && optional.isPresent()) {
             //文件存在
             ExceptionCast.cast(MediaCode.UPLOAD_FILE_REGISTER_EXIST);
         }
         //文件不存在时做一些准备工作，检查文件所在目录是否存在，否则创建
         File fileFolder = new File(fileFolderPath);
-        if(!fileFolder.exists()){
+        if (!fileFolder.exists()) {
             fileFolder.mkdirs();
         }
         return new ResponseResult(CommonCode.SUCCESS);
+    }
+
+    //分块检查
+    public CheckChunkResult checkchunk(String fileMd5, Integer chunk, Integer chunkSize) {
+        //检查分块文件是否存在
+        //得到分块文件的所在目录
+        String chunkFileFolderPath = this.getChunkFileFolderPath(fileMd5);
+        //块文件
+        File chunkFile = new File(chunkFileFolderPath + chunk);
+        if(chunkFile.exists()){
+            //块文件存在
+            return new CheckChunkResult(CommonCode.SUCCESS,true);
+        }else {
+            //块文件不存在
+            return new CheckChunkResult(CommonCode.SUCCESS,false);
+        }
     }
 }
