@@ -25,15 +25,7 @@ public class RabbitMQConfig {
     //消费者并发数量
     public static final int DEFAULT_CONCURRENT = 10;
 
-    @Bean("customContainerFactory")
-    public SimpleRabbitListenerContainerFactory containerFactory(SimpleRabbitListenerContainerFactoryConfigurer configurer,
-                                                                 ConnectionFactory connectionFactory){
-        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
-        factory.setConcurrentConsumers(DEFAULT_CONCURRENT);
-        factory.setMaxConcurrentConsumers(DEFAULT_CONCURRENT);
-        configurer.configure(factory,connectionFactory);
-        return factory;
-    }
+
 
     /**
      * 交换机配置
