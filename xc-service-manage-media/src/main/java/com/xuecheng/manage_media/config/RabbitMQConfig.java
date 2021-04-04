@@ -1,8 +1,10 @@
 package com.xuecheng.manage_media.config;
 
 import org.springframework.amqp.core.*;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.amqp.SimpleRabbitListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,6 +25,15 @@ public class RabbitMQConfig {
     //消费者并发数量
     public static final int DEFAULT_CONCURRENT = 10;
 
+    @Bean("customContainerFactory")
+    public SimpleRabbitListenerContainerFactory containerFactory(SimpleRabbitListenerContainerFactoryConfigurer configurer,
+                                                                 ConnectionFactory connectionFactory){
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConcurrentConsumers(DEFAULT_CONCURRENT);
+        factory.setMaxConcurrentConsumers(DEFAULT_CONCURRENT);
+        configurer.configure(factory,connectionFactory);
+        return factory;
+    }
 
     /**
      * 交换机配置
