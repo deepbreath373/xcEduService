@@ -28,7 +28,7 @@ public class EsCourseController implements EsCourseControllerApi {
 
     @Override
     @GetMapping("/getall/{id}")
-    public Map<String, CoursePub> getall(String id) {
+    public Map<String, CoursePub> getall(@PathVariable("id") String id) {
         return esCourseService.getall(id);
     }
 }
