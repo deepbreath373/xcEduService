@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/search/course")
 public class EsCourseController implements EsCourseControllerApi {
@@ -22,5 +24,11 @@ public class EsCourseController implements EsCourseControllerApi {
     @GetMapping(value = "/list/{page}/{size}")
     public QueryResponseResult<CoursePub> list(@PathVariable("page") int page, @PathVariable("size") int size, CourseSearchParam courseSearchParam) {
         return esCourseService.list(page, size, courseSearchParam);
+    }
+
+    @Override
+    @GetMapping("/getall/{id}")
+    public Map<String, CoursePub> getall(String id) {
+        return esCourseService.getall(id);
     }
 }

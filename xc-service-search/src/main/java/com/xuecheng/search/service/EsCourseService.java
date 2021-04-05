@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -87,7 +88,7 @@ public class EsCourseService {
         if (size <= 0) {
             size = 20;
         }
-        int start = (page-1)*size;
+        int start = (page - 1) * size;
         searchSourceBuilder.from(start);
         searchSourceBuilder.size(size);
         //设置boolQueryBuilder到searchSourceBuilder
@@ -126,9 +127,9 @@ public class EsCourseService {
                 String name = (String) sourceAsMap.get("name");
                 //取出高亮字段内容
                 Map<String, HighlightField> highlightFields = hit.getHighlightFields();
-                if(highlightFields != null){
+                if (highlightFields != null) {
                     HighlightField nameField = highlightFields.get("name");
-                    if(nameField!=null){
+                    if (nameField != null) {
                         Text[] fragments = nameField.getFragments();
                         StringBuffer stringBuffer = new StringBuffer();
                         for (Text str : fragments) {
@@ -170,5 +171,48 @@ public class EsCourseService {
         queryResult.setList(list);
         QueryResponseResult<CoursePub> queryResponseResult = new QueryResponseResult<CoursePub>(CommonCode.SUCCESS, queryResult);
         return queryResponseResult;
+    }
+
+    //使用ES的客户端向ES请求查询索引信息
+    public Map<String, CoursePub> getall(String id) {
+        //定义一个搜索请求对象
+        SearchRequest searchRequest = new SearchRequest(index);
+        //指定type
+        searchRequest.types(type);
+        //定义SearchSourceBuilder
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        //设置使用termQuery,不设置过滤源字段,取出所有字段
+        searchSourceBuilder.query(QueryBuilders.termQuery("id", id));
+
+        searchRequest.source(searchSourceBuilder);
+        //定义最终返回的课程信息
+        Map<String,CoursePub> map = new HashMap<>();
+        try {
+            SearchResponse search = restHighLevelClient.search(searchRequest);
+            SearchHits hits = search.getHits();
+            SearchHit[] searchHits = hits.getHits();
+            for (SearchHit searchHit : searchHits) {
+                CoursePub coursePub = new CoursePub();
+                //获取源文档
+                Map<String, Object> sourceAsMap = searchHit.getSourceAsMap();
+                String courseId = (String) sourceAsMap.get("id");
+                String name = (String) sourceAsMap.get("name");
+                String grade = (String) sourceAsMap.get("grade");
+                String charge = (String) sourceAsMap.get("charge");
+                String pic = (String) sourceAsMap.get("pic");
+                String description = (String) sourceAsMap.get("description");
+                String teachplan = (String) sourceAsMap.get("teachplan");
+                coursePub.setId(courseId);
+                coursePub.setName(name);
+                coursePub.setPic(pic);
+                coursePub.setGrade(grade);
+                coursePub.setTeachplan(teachplan);
+                coursePub.setDescription(description);
+                map.put(courseId, coursePub);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return map;
     }
 }
