@@ -44,6 +44,8 @@ public class CourseService {
     @Autowired
     TeachplanRepository teachplanRepository;
     @Autowired
+    TeachplanMediaRepository teachplanMediaRepository;
+    @Autowired
     CoursePicRepository coursePicRepository;
     @Autowired
     CoursePubRepository coursePubRepository;
@@ -359,7 +361,7 @@ public class CourseService {
         //先创建一个coursePub对象
         CoursePub coursePub = createCoursePub(id);
         //将coursePub对象保存到数据库
-        saveCoursePub(id,coursePub);
+        saveCoursePub(id, coursePub);
 
         String pageUrl = cmsPostPageResult.getPageUrl();
         return new CoursePublishResult(CommonCode.SUCCESS, pageUrl);
@@ -377,7 +379,7 @@ public class CourseService {
         }
 
         //将coursePub对象中的信息保存到coursePubNew中
-        BeanUtils.copyProperties(coursePub,coursePubNew);
+        BeanUtils.copyProperties(coursePub, coursePubNew);
         coursePubNew.setId(id);
         //时间戳,给logstach使用
         coursePubNew.setTimestamp(new Date());
@@ -424,5 +426,41 @@ public class CourseService {
         courseBaseById.setStatus("202002");
         courseBaseRepository.save(courseBaseById);
         return courseBaseById;
+    }
+
+    //保存课程计划与媒资文件的关联信息
+    public ResponseResult savemedia(TeachplanMedia teachplanMedia) {
+        if (teachplanMedia == null || StringUtils.isEmpty(teachplanMedia.getTeachplanId())) {
+            ExceptionCast.cast(CommonCode.INVALID_PARAM);
+        }
+        //校验课程计划是否为3级
+        String teachplanId = teachplanMedia.getTeachplanId();
+        //查询课程计划
+        Optional<Teachplan> optional = teachplanRepository.findById(teachplanId);
+        if (!optional.isPresent()) {
+            ExceptionCast.cast(CommonCode.INVALID_PARAM);
+        }
+        Teachplan teachplan = optional.get();
+        String grade = teachplan.getGrade();
+        if (StringUtils.isEmpty(grade) || !"3".equals(grade)) {
+            //只允许选择第三级的课程计划关联视频
+            ExceptionCast.cast(CourseCode.COURSE_MEDIA_TEACHPLAN_GRADEERROR);
+        }
+        //查询teachplanMedia
+        Optional<TeachplanMedia> mediaOptional = teachplanMediaRepository.findById(teachplanId);
+        TeachplanMedia one = null;
+        if (mediaOptional.isPresent()) {
+            one = mediaOptional.get();
+        } else {
+            one = new TeachplanMedia();
+        }
+        //将TeachplanMedia保存的数据库
+        one.setCourseId(teachplan.getCourseid());
+        one.setMediaId(teachplanMedia.getMediaId());
+        one.setMediaFileOriginalName(teachplanMedia.getMediaFileOriginalName());
+        one.setMediaUrl(teachplanMedia.getMediaUrl());
+        one.setTeachplanId(teachplanId);
+        teachplanMediaRepository.save(one);
+        return new ResponseResult(CommonCode.SUCCESS);
     }
 }
