@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +46,8 @@ public class CourseService {
     TeachplanRepository teachplanRepository;
     @Autowired
     TeachplanMediaRepository teachplanMediaRepository;
+    @Autowired
+    TeachplanMediaPubRepository teachplanMediaPubRepository;
     @Autowired
     CoursePicRepository coursePicRepository;
     @Autowired
@@ -362,9 +365,29 @@ public class CourseService {
         CoursePub coursePub = createCoursePub(id);
         //将coursePub对象保存到数据库
         saveCoursePub(id, coursePub);
-
+        //得到页面的url
         String pageUrl = cmsPostPageResult.getPageUrl();
+        //向teachplanMediaPub保存课程媒资信息
+        saveTeachplanMediaPub(id);
         return new CoursePublishResult(CommonCode.SUCCESS, pageUrl);
+    }
+
+    //向teachplanMediaPub保存课程媒资信息
+    private void saveTeachplanMediaPub(String courseId){
+        //先删除teachplanMediaPub中的数据
+        teachplanMediaPubRepository.deleteByCourseId(courseId);
+        //从teachplanMediaPub中查询
+        List<TeachplanMedia> teachplanMediaList = teachplanMediaRepository.findByCourseId(courseId);
+        List<TeachplanMediaPub> teachplanMediaPubs = new ArrayList<>();
+        for (TeachplanMedia teachplanMedia : teachplanMediaList) {
+            TeachplanMediaPub teachplanMediaPub = new TeachplanMediaPub();
+            BeanUtils.copyProperties(teachplanMedia,teachplanMediaPub);
+            //添加时间戳
+            teachplanMediaPub.setTimestamp(new Date());
+            teachplanMediaPubs.add(teachplanMediaPub);
+        }
+        //将teachplanMediaList插入到teachplanMediaPub
+        teachplanMediaPubRepository.saveAll(teachplanMediaPubs);
     }
 
     //将coursePub对象保存到数据库
