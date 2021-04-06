@@ -12,7 +12,6 @@ import org.springframework.context.annotation.ComponentScan;
  * @version 1.0
  **/
 @EnableDiscoveryClient
-@EnableFeignClients
 @SpringBootApplication
 @EntityScan("com.xuecheng.framework.domain.search")//扫描实体类
 @ComponentScan(basePackages={"com.xuecheng.api"})//扫描接口

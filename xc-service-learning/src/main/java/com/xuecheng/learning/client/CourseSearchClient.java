@@ -6,7 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(value = XcServiceList.XC_SERVICE_SEARCH)
+@FeignClient(value = "XC-SERVICE-SEARCH")
 public interface CourseSearchClient {
     //根据课程计划id查询课程媒资
     @GetMapping("/search/course/getmedia/{teachplanId}")

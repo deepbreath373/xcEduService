@@ -23,7 +23,7 @@ public class LearningService {
 
         //远程调用搜索服务查询课程计划所对应的课程媒资信息
         TeachplanMediaPub teachplanMediaPub = courseSearchClient.getmedia(teachplanId);
-        if(teachplanMediaPub == null || StringUtils.isEmpty(teachplanMediaPub.getMediaId())){
+        if(teachplanMediaPub == null || StringUtils.isEmpty(teachplanMediaPub.getMediaUrl())){
             ExceptionCast.cast(LearningCode.LEARNING_GETMEDIA_ERROR);
         }
         return new GetMediaResult(CommonCode.SUCCESS,teachplanMediaPub.getMediaUrl());
