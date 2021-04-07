@@ -107,7 +107,7 @@
             <version>3.23.1-GA</version>
         </dependency>
 
-        <!--下面三个适配jdk11兼容性问题-->
+        <!--下面三个适配jdk兼容性问题-->
 
         <!-- https://mvnrepository.com/artifact/javax.activation/activation -->
         <dependency>
