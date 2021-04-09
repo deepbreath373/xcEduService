@@ -69,9 +69,23 @@ public class AuthController implements AuthControllerApi {
         CookieUtil.addCookie(response, cookieDomain, "/", "uid", token, cookieMaxAge, false);
     }
 
+    //将token从cookie中删除
+    private void clearCookie(String token) {
+        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+        CookieUtil.addCookie(response, cookieDomain, "/", "uid", token, 0, false);
+    }
+
+    //用户退出
     @Override
+    @PostMapping("/userlogout")
     public ResponseResult logout() {
-        return null;
+        //取出cookie中的用户身份令牌
+        String uid = getTokenFromCookie();
+        //删除redis中的token
+        boolean result = authService.delToken(uid);
+        //清除cookie
+        this.clearCookie(uid);
+        return new ResponseResult(CommonCode.SUCCESS);
     }
 
     @Override

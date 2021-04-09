@@ -74,8 +74,15 @@ public class AuthService {
         return expire > 0;
     }
 
+    //删除redis中的token
+    public boolean delToken(String access_token) {
+        String key = "user_token:" + access_token;
+        stringRedisTemplate.delete(key);
+        return true;
+    }
+
     //从redis查询令牌
-    public AuthToken getUserToken(String token){
+    public AuthToken getUserToken(String token) {
         String key = "user_token:" + token;
         //从redis中取出令牌信息
         String value = stringRedisTemplate.opsForValue().get(key);
