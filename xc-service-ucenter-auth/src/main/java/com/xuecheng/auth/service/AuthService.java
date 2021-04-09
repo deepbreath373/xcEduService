@@ -74,6 +74,21 @@ public class AuthService {
         return expire > 0;
     }
 
+    //从redis查询令牌
+    public AuthToken getUserToken(String token){
+        String key = "user_token:" + token;
+        //从redis中取出令牌信息
+        String value = stringRedisTemplate.opsForValue().get(key);
+        //转成对象
+        try {
+            AuthToken authToken = JSON.parseObject(value, AuthToken.class);
+            return authToken;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     //申请令牌
     private AuthToken applyToken(String username, String password, String clientId, String clientSecret) {
         //从eureka中获取认证服务的地址（因为spring security在认证服务中
