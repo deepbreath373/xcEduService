@@ -32,12 +32,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         //取出身份，如果身份为空说明没有认证
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         //没有认证统一采用httpbasic认证，httpbasic中存储了client_id和client_secret，开始认证client_id和client_secret
-        if(authentication==null){
+        if (authentication == null) {
             ClientDetails clientDetails = clientDetailsService.loadClientByClientId(username);
-            if(clientDetails!=null){
+            if (clientDetails != null) {
                 //密码
                 String clientSecret = clientDetails.getClientSecret();
-                return new User(username,clientSecret,AuthorityUtils.commaSeparatedStringToAuthorityList(""));
+                return new User(username, clientSecret, AuthorityUtils.commaSeparatedStringToAuthorityList(""));
             }
         }
         if (StringUtils.isEmpty(username)) {
@@ -45,7 +45,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
         //远程调用用户中心根据账号查询用户信息
         XcUserExt userext = userClient.getUserext(username);
-        if(userext == null){
+        if (userext == null) {
             //返回空给spring security表示用户不存在
             return null;
         }
@@ -54,20 +54,23 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         userext.setPassword(new BCryptPasswordEncoder().encode("123"));*/
 
         //权限先用静态的
-        userext.setPermissions(new ArrayList<XcMenu>());
+        //userext.setPermissions(new ArrayList<XcMenu>());
 
         //取出正确密码（hash值）
         String password = userext.getPassword();
         //这里暂时使用静态密码
-//       String password ="123";
+        //String password ="123";
         //用户权限，这里暂时使用静态数据，最终会从数据库读取
         //从数据库获取权限
         List<XcMenu> permissions = userext.getPermissions();
+        if (permissions == null) {
+            permissions = new ArrayList<>();
+        }
         List<String> user_permission = new ArrayList<>();
-        permissions.forEach(item-> user_permission.add(item.getCode()));
-        user_permission.add("course_get_baseinfo");//查询课程信息
-        user_permission.add("course_pic_list");//图片查询
-        String user_permission_string  = StringUtils.join(user_permission.toArray(), ",");
+        permissions.forEach(item -> user_permission.add(item.getCode()));
+        //user_permission.add("course_get_baseinfo");//查询课程信息
+        //user_permission.add("course_pic_list");//图片查询
+        String user_permission_string = StringUtils.join(user_permission.toArray(), ",");
         UserJwt userDetails = new UserJwt(username,
                 password,
                 AuthorityUtils.commaSeparatedStringToAuthorityList(user_permission_string));
