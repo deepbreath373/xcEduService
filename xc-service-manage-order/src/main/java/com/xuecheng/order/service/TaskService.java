@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -42,6 +43,13 @@ public class TaskService {
             one.setUpdateTime(new Date());
             xcTaskRepository.save(one);
         }
+    }
 
+    //获取任务
+    @Transactional
+    public int getTask(String id, int version){
+        //通过乐观锁的方式来更新数据表，如果结果大于0说明取到任务
+        int count = xcTaskRepository.updateTaskVersion(id, version);
+        return count;
     }
 }

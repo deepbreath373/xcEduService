@@ -33,11 +33,14 @@ public class ChooseCourseTask {
         System.out.println(xcTaskList);
         //调用service发布消息，将添加选课的任务发送给mq
         for (XcTask xcTask : xcTaskList) {
-            //要发送的交换机
-            String ex = xcTask.getMqExchange();
-            //发送消息要带routingKey
-            String routingKey = xcTask.getMqRoutingkey();
-            taskService.publish(xcTask,ex,routingKey);
+            //取任务
+            if (taskService.getTask(xcTask.getId(), xcTask.getVersion()) > 0) {
+                //要发送的交换机
+                String ex = xcTask.getMqExchange();
+                //发送消息要带routingKey
+                String routingKey = xcTask.getMqRoutingkey();
+                taskService.publish(xcTask, ex, routingKey);
+            }
         }
     }
 
