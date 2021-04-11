@@ -23,14 +23,22 @@ public class ChooseCourseTask {
 
     //定时发送添加选课任务
     @Scheduled(cron = "0/3 * * * * *")
-    public void sendChoosecourseTask(){
+    public void sendChoosecourseTask() {
         //得到1分钟之前的时间
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(new Date());
-        calendar.set(GregorianCalendar.MINUTE,-1);
+        calendar.set(GregorianCalendar.MINUTE, -1);
         Date time = calendar.getTime();
         List<XcTask> xcTaskList = taskService.findXcTaskList(time, 100);
         System.out.println(xcTaskList);
+        //调用service发布消息，将添加选课的任务发送给mq
+        for (XcTask xcTask : xcTaskList) {
+            //要发送的交换机
+            String ex = xcTask.getMqExchange();
+            //发送消息要带routingKey
+            String routingKey = xcTask.getMqRoutingkey();
+            taskService.publish(xcTask,ex,routingKey);
+        }
     }
 
     //定义任务调试策略
