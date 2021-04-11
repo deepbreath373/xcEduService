@@ -98,7 +98,7 @@ public class AuthService {
 
     //申请令牌
     private AuthToken applyToken(String username, String password, String clientId, String clientSecret) {
-        //从eureka中获取认证服务的地址（因为spring security在认证服务中
+        //从eureka中获取认证服务的地址（因为spring security在认证服务中）
         ServiceInstance serviceInstance = loadBalancerClient.choose(XcServiceList.XC_SERVICE_UCENTER_AUTH);
         //此地址就是http://ip:port
         URI uri = serviceInstance.getUri();

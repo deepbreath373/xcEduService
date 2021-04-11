@@ -28,6 +28,7 @@ public class ExceptionCatch {
     @ExceptionHandler(CustomException.class)
     @ResponseBody
     public ResponseResult customException(CustomException customException){
+        customException.printStackTrace();
         //记录日志
         LOGGER.error("catch exception:{}",customException.getMessage());
         ResultCode resultCode = customException.getResultCode();
@@ -38,6 +39,7 @@ public class ExceptionCatch {
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public ResponseResult exception(Exception exception){
+        exception.printStackTrace();
         //记录日志
         LOGGER.error("catch exception:{}",exception.getMessage());
         if(EXCEPTIONS == null){
