@@ -11,6 +11,8 @@ import com.xuecheng.framework.domain.course.response.CoursePublishResult;
 import com.xuecheng.framework.model.response.CommonCode;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.framework.model.response.ResponseResult;
+import com.xuecheng.framework.utils.XcOauth2Util;
+import com.xuecheng.framework.web.BaseController;
 import com.xuecheng.manage_course.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/course")
-public class CourseController implements CourseControllerApi {
+public class CourseController extends BaseController implements CourseControllerApi {
 
     @Autowired
     CourseService courseService;
@@ -40,8 +42,13 @@ public class CourseController implements CourseControllerApi {
 
     @Override
     @GetMapping("/coursebase/list/{page}/{size}")
-    public QueryResponseResult<CourseInfo> findCourseList(@PathVariable("page") int page,@PathVariable("size") int size, CourseListRequest courseListRequest) {
-        return courseService.findCourseList(page, size, courseListRequest);
+    public QueryResponseResult<CourseInfo> findCourseList(@PathVariable("page") int page, @PathVariable("size") int size, CourseListRequest courseListRequest) {
+        //获取当前用户信息
+        XcOauth2Util xcOauth2Util = new XcOauth2Util();
+        XcOauth2Util.UserJwt userJwt = xcOauth2Util.getUserJwtFromHeader(request);
+        //当前用户所属单位的id
+        String company_id = userJwt.getCompanyId();
+        return courseService.findCourseList(company_id, page, size, courseListRequest);
     }
 
     @Override
@@ -58,8 +65,8 @@ public class CourseController implements CourseControllerApi {
 
     @Override
     @PostMapping("/coursebase/update/{id}")
-    public ResponseResult updateCourseBase(@PathVariable("id") String id,@RequestBody CourseBase courseBase) {
-        return courseService.updateCoursebase(id,courseBase);
+    public ResponseResult updateCourseBase(@PathVariable("id") String id, @RequestBody CourseBase courseBase) {
+        return courseService.updateCoursebase(id, courseBase);
     }
 
     @Override
@@ -70,9 +77,9 @@ public class CourseController implements CourseControllerApi {
 
     @Override
     @PostMapping("/coursepic/add")
-    public ResponseResult addCoursePic(@RequestParam("courseId") String courseId,@RequestParam("pic") String pic) {
+    public ResponseResult addCoursePic(@RequestParam("courseId") String courseId, @RequestParam("pic") String pic) {
         //保存课程图片
-        return courseService.addCoursePic(courseId,pic);
+        return courseService.addCoursePic(courseId, pic);
     }
 
     @PreAuthorize("hasAuthority('course_pic_list')")
@@ -114,11 +121,11 @@ public class CourseController implements CourseControllerApi {
 
     @Override
     @PostMapping("/coursemarket/update/{id}")
-    public ResponseResult updatecourseMarket(@PathVariable("id") String id,@RequestBody CourseMarket courseMarket) {
+    public ResponseResult updatecourseMarket(@PathVariable("id") String id, @RequestBody CourseMarket courseMarket) {
         CourseMarket courseMarket_u = courseService.updateCourseMarket(id, courseMarket);
-        if(courseMarket_u != null){
+        if (courseMarket_u != null) {
             return new ResponseResult(CommonCode.SUCCESS);
-        }else{
+        } else {
             return new ResponseResult(CommonCode.FAIL);
         }
     }

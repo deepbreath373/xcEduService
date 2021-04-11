@@ -73,10 +73,12 @@ public class CourseService {
         return teachplanMapper.selectList(courseId);
     }
 
-    public QueryResponseResult<CourseInfo> findCourseList(int page, int size, CourseListRequest courseListRequest) {
+    public QueryResponseResult<CourseInfo> findCourseList(String company_id, int page, int size, CourseListRequest courseListRequest) {
         if (courseListRequest == null) {
             courseListRequest = new CourseListRequest();
         }
+        //将公司id参数传入dao
+        courseListRequest.setCompanyId(company_id);
         if (page <= 0) {
             page = 0;
         }
@@ -373,7 +375,7 @@ public class CourseService {
     }
 
     //向teachplanMediaPub保存课程媒资信息
-    private void saveTeachplanMediaPub(String courseId){
+    private void saveTeachplanMediaPub(String courseId) {
         //先删除teachplanMediaPub中的数据
         teachplanMediaPubRepository.deleteByCourseId(courseId);
         //从teachplanMediaPub中查询
@@ -381,7 +383,7 @@ public class CourseService {
         List<TeachplanMediaPub> teachplanMediaPubs = new ArrayList<>();
         for (TeachplanMedia teachplanMedia : teachplanMediaList) {
             TeachplanMediaPub teachplanMediaPub = new TeachplanMediaPub();
-            BeanUtils.copyProperties(teachplanMedia,teachplanMediaPub);
+            BeanUtils.copyProperties(teachplanMedia, teachplanMediaPub);
             //添加时间戳
             teachplanMediaPub.setTimestamp(new Date());
             teachplanMediaPubs.add(teachplanMediaPub);
