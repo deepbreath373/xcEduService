@@ -33,3 +33,45 @@ xc
 ├── xc-service-ucenter -- 用户中心
 └── xc-service-ucenter-auth -- 用户的登录认证
 ```
+
+## 技术选型
+
+### 后端技术
+
+| 技术                  | 说明                | 官网                                                 |
+| --------------------- | ------------------- | ---------------------------------------------------- |
+| SpringBoot            | 容器+MVC框架        | https://spring.io/projects/spring-boot               |
+| SpringCloud           | 微服务              | https://spring.io/projects/spring-cloud              |
+| SpringSecurity Oauth2 | 认证和授权框架      | https://spring.io/projects/spring-security-oauth     |
+| SpringTask            | 任务处理            |                                                      |
+| Swagger-UI            | 服务端测试工具      | https://github.com/swagger-api/swagger-ui            |
+| MyBatis               | ORM框架(MySQL)      | http://www.mybatis.org/mybatis-3/zh/index.html       |
+| PageHelper            | MyBatis物理分页插件 | http://git.oschina.net/free/Mybatis_PageHelper       |
+| ElasticSearch         | 搜索引擎            | https://github.com/elastic/elasticsearch             |
+| RabbitMq              | 消息队列            | https://www.rabbitmq.com/                            |
+| Redis                 | 分布式缓存          | https://redis.io/                                    |
+| MongoDb               | NoSql数据库         | https://www.mongodb.com/                             |
+| MySQL                 | 关系型数据库        | https://www.mysql.com/cn/                            |
+| JWT                   | JWT登录支持         | https://github.com/jwtk/jjwt                         |
+| LogStash              | 数据采集            | https://github.com/logstash/logstash-logback-encoder |
+| Lombok                | 简化对象封装工具    | https://github.com/rzwitserloot/lombok               |
+
+### 前端技术
+
+| 技术       | 说明       | 官网                                                  |
+| ---------- | ---------- | ----------------------------------------------------- |
+| Vue        | 前端框架   | https://vuejs.org/                                    |
+| Element-UI | 前端UI框架 | [https://element.eleme.io](https://element.eleme.io/) |
+
+## 开发工具
+
+| 工具         | 说明                |
+| ------------ | ------------------- |
+| IDEA         | java开发IDE         |
+| WebStorm     | 前端开发IDE         |
+| RedisDesktop | redis客户端连接工具 |
+| SQLyog       | MySQL连接工具       |
+| Studio-3T    | MongoDB连接工具     |
+| Postman      | API接口调试工具     |
+| Typora       | Markdown编辑器      |
+
