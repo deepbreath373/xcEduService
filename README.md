@@ -75,3 +75,6 @@ xc
 | Postman      | API接口调试工具     |
 | Typora       | Markdown编辑器      |
 
+## 架构图
+
+![image-20210416161418340](C:\Users\西沉\AppData\Roaming\Typora\typora-user-images\image-20210416161418340.png)
