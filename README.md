@@ -76,5 +76,4 @@ xc
 | Typora       | Markdown编辑器      |
 
 ## 架构图
-
-![image-20210416161418340](C:\Users\西沉\AppData\Roaming\Typora\typora-user-images\image-20210416161418340.png)
+![image](https://user-images.githubusercontent.com/61624237/115703807-21f79a00-a39d-11eb-939b-0c1e2b7838a1.png)
