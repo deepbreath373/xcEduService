@@ -75,3 +75,7 @@ xc
 | Postman      | API接口调试工具     |
 | Typora       | Markdown编辑器      |
 
+## 架构图
+![image](https://user-images.githubusercontent.com/61624237/115703807-21f79a00-a39d-11eb-939b-0c1e2b7838a1.png)
+
+
