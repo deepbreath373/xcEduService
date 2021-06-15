@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.Date;
 
 public interface XcTaskRepository extends JpaRepository<XcTask, String> {
-    //查询某个时间之间的前n条任务
+    //查询某个时间之前的前n条任务
     Page<XcTask> findByUpdateTimeBefore(Pageable pageable, Date updateTime);
 
     //更新updateTime

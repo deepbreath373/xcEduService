@@ -56,7 +56,10 @@ public class LearningService {
         if (xcTask == null || StringUtils.isEmpty(xcTask.getId())) {
             ExceptionCast.cast(LearningCode.CHOOSECOURSE_TASKISNULL);
         }
-
+        Optional<XcTaskHis> xcTaskHisOptional = xcTaskHisRepository.findById(xcTask.getId());
+        if(xcTaskHisOptional.isPresent()){
+            return new ResponseResult(CommonCode.SUCCESS);
+        }
         XcLearningCourse xcLearningCourse = xcLearningCourseRepository.findByUserIdAndCourseId(userId, courseId);
         if (xcLearningCourse != null) {
             //更新选课记录
